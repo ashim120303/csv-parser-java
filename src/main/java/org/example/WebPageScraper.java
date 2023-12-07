@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -14,7 +15,13 @@ public class WebPageScraper {
     public WebPageScraper() {
         // Установите путь к драйверу Chrome
         System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
-        driver = new ChromeDriver();
+
+        // Создайте объект ChromeOptions
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--headless");  // Добавьте опцию для headless режима
+
+        // Передайте объект ChromeOptions при создании ChromeDriver
+        driver = new ChromeDriver(chromeOptions);
     }
 
     public int getSearchResultsCount(String query) {
