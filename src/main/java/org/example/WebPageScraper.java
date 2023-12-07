@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class WebPageScraper {
 
     private WebDriver driver;
+    private WebDriverWait wait;
     int counter = 0;
 
     public WebPageScraper() {
@@ -23,6 +24,8 @@ public class WebPageScraper {
 
         // Передайте объект ChromeOptions при создании ChromeDriver
         driver = new ChromeDriver(chromeOptions);
+
+        wait = new WebDriverWait(driver, 10);
     }
 
     public int getSearchResultsCount(String query) {
@@ -35,15 +38,12 @@ public class WebPageScraper {
         counter ++;
 
         try {
-            WebDriverWait wait = new WebDriverWait(driver, 10);
             WebElement countElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("searching-results__count")));
             String countText = countElement.getText();
             resultCount = Integer.parseInt(countText.replaceAll("\\D", ""));
             System.out.println(counter + ". Результат поиска:  " + query + ": " + resultCount);
         } catch (org.openqa.selenium.TimeoutException e) {
-            System.out.println("Element with class 'searching-results__count' not found. Setting resultCount to 0.");
-        } catch (NumberFormatException e) {
-            System.err.println("Unable to parse search results count. Setting resultCount to 0.");
+            System.out.println("TimeoutException: Элемент с классом searching-results__count не найден.");
         }
 
         return resultCount;
