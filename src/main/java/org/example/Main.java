@@ -17,7 +17,7 @@ public class Main {
                 String query = line.trim();
                 int resultCount = webPageScraper.getSearchResultsCount(query);
 
-                if (resultCount <= 150) {
+                if (resultCount != -1 && resultCount <= 150) {
                     FileHandler.saveToFile(line, outputCsv);
                 }
             }

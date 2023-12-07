@@ -1,6 +1,7 @@
 package org.example;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -35,19 +36,21 @@ public class WebPageScraper {
         driver.get("https://www.wildberries.ru/catalog/0/search.aspx?search=" + query);
 
         int resultCount = 0;
-        counter ++;
+        counter++;
 
         try {
             WebElement countElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("searching-results__count")));
             String countText = countElement.getText();
             resultCount = Integer.parseInt(countText.replaceAll("\\D", ""));
             System.out.println(counter + ". Результат поиска:  " + query + ": " + resultCount);
-        } catch (org.openqa.selenium.TimeoutException e) {
-            System.out.println("TimeoutException: Элемент с классом searching-results__count не найден.");
+        } catch (TimeoutException e) {
+            System.out.println(counter + ". Результат поиска для запроса: " + query + " не найден. Пропуск запроса.");
+            return -1; // Возвращаем -1, чтобы показать, что результат не был найден
         }
 
         return resultCount;
     }
+
 
     public void closeDriver() {
         driver.quit();
