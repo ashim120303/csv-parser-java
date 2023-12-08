@@ -9,6 +9,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.List;
+
 public class WebPageScraper {
 
     private WebDriver driver;
@@ -44,12 +46,19 @@ public class WebPageScraper {
             resultCount = Integer.parseInt(countText.replaceAll("\\D", ""));
             System.out.println(counter + ". Результат поиска:  " + query + ": " + resultCount);
         } catch (TimeoutException e) {
-            System.out.println(counter + ". Результат поиска для запроса: " + query + " не найден. Пропуск запроса.");
-            return -1; // Возвращаем -1, чтобы показать, что результат не был найден
+            // Проверка наличия элемента с классом not-found-search__title
+            List<WebElement> notFoundElements = driver.findElements(By.className("not-found-search__title"));
+            if (!notFoundElements.isEmpty()) {
+                System.out.println(counter + ". Результат поиска для запроса: " + query + " ничего не найдено.");
+                return 0; // Возвращаем 0, когда на странице есть элемент not-found-search__title
+            } else {
+                System.out.println(counter + ". Результат поиска для запроса: " + query + " бренд или id продукта. Пропуск запроса.");
+                return -1; // Возвращаем -1, на странице нет элемента not-found-search__title и searching-results__count
+            }
         }
-
         return resultCount;
     }
+
 
 
     public void closeDriver() {
