@@ -30,6 +30,6 @@ public class Main {
 
     public static void main(String[] args) {
         Main main = new Main();
-        main.scrapeData("вб.csv", "output.csv");
+        main.scrapeData("test.csv", "output.csv");
     }
 }

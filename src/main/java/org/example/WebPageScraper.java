@@ -28,7 +28,7 @@ public class WebPageScraper {
         // Передайте объект ChromeOptions при создании ChromeDriver
         driver = new ChromeDriver(chromeOptions);
 
-        wait = new WebDriverWait(driver, 10);
+        wait = new WebDriverWait(driver, 5);
     }
 
     public int getSearchResultsCount(String query) {
@@ -41,7 +41,12 @@ public class WebPageScraper {
         counter++;
 
         try {
-            WebElement countElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("searching-results__count")));
+            // Проверка наличия элемента searching-results__count
+            WebElement countElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.className("searching-results__count")));
+
+            // Проверка видимости элемента searching-results__count
+            wait.until(ExpectedConditions.visibilityOf(countElement));
+
             String countText = countElement.getText();
             resultCount = Integer.parseInt(countText.replaceAll("\\D", ""));
             System.out.println(counter + ". Результат поиска:  " + query + ": " + resultCount);
@@ -58,8 +63,6 @@ public class WebPageScraper {
         }
         return resultCount;
     }
-
-
 
     public void closeDriver() {
         driver.quit();
