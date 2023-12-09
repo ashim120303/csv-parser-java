@@ -15,7 +15,6 @@ public class WebPageScraper {
 
     private WebDriver driver;
     private WebDriverWait wait;
-    int counter = 0;
 
     public WebPageScraper() {
         // Установите путь к драйверу Chrome
@@ -32,13 +31,17 @@ public class WebPageScraper {
     }
 
     public int getSearchResultsCount(String query) {
-        // Удаляем цифры после последней запятой
+        // Удаляем колличество запросов (цифры после последней запятой)
         query = query.replaceFirst(",\\d+$", "");
+
+        // Сайт Wildberries меняет + на %2B в запросе
+        if (query.contains("+")) {
+            query = query.replace("+", "%2B");
+        }
 
         driver.get("https://www.wildberries.ru/catalog/0/search.aspx?search=" + query);
 
         int resultCount = 0;
-        counter++;
 
         try {
             // Проверка наличия элемента searching-results__count
@@ -49,16 +52,16 @@ public class WebPageScraper {
 
             String countText = countElement.getText();
             resultCount = Integer.parseInt(countText.replaceAll("\\D", ""));
-            System.out.println(counter + ". Результат поиска:  " + query + ": " + resultCount);
+            System.out.println("Результат поиска:  " + query + ": " + resultCount);
         } catch (TimeoutException e) {
-            // Проверка наличия элемента с классом not-found-search__title
+            // Проверка наличия элемента с классом not-found-search__title (если результатов поиска нет)
             List<WebElement> notFoundElements = driver.findElements(By.className("not-found-search__title"));
             if (!notFoundElements.isEmpty()) {
-                System.out.println(counter + ". Результат поиска для запроса: " + query + " ничего не найдено.");
+                System.out.println("Результат поиска для запроса: " + query + " ничего не найдено.");
                 return 0; // Возвращаем 0, когда на странице есть элемент not-found-search__title
             } else {
-                System.out.println(counter + ". Результат поиска для запроса: " + query + " бренд или id продукта. Пропуск запроса.");
-                return -1; // Возвращаем -1, на странице нет элемента not-found-search__title и searching-results__count
+                System.out.println("Результат поиска для запроса: " + query + " бренд или id продукта. Пропуск запроса.");
+                return -1; // Возвращаем -1, на странице нет элемента not-found-search__title и searching-results__count (Бренд или id продукта)
             }
         }
         return resultCount;

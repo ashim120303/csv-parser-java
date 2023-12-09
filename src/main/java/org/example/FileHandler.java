@@ -9,9 +9,9 @@ public class FileHandler {
 
     public static void saveToFile(String query, int resultCount, String filePath) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-            writer.write(query + "," + resultCount);
+            writer.write(query);
             writer.newLine();
-            System.out.println("Сохранено: " + query + ": " + resultCount);
+            System.out.println("Сохранено: " + query);
         } catch (IOException e) {
             e.printStackTrace();
         }
