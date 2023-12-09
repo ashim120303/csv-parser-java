@@ -8,10 +8,10 @@ import java.util.concurrent.Executors;
 
 public class Main {
 
+    private final ThreadLocal<WebPageScraper> scraperThreadLocal = ThreadLocal.withInitial(WebPageScraper::new);
+
     public void scrapeData(String inputCsv, String outputCsv) {
         FileHandler.createFileIfNotExists(outputCsv);
-
-        WebPageScraper webPageScraper = new WebPageScraper();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(inputCsv))) {
             ExecutorService executor = Executors.newFixedThreadPool(10);
@@ -19,7 +19,7 @@ public class Main {
             String line;
             while ((line = reader.readLine()) != null) {
                 final String query = line.trim();
-                executor.submit(() -> processQuery(query, webPageScraper, outputCsv));
+                executor.submit(() -> processQuery(query, outputCsv));
             }
 
             executor.shutdown();
@@ -28,12 +28,11 @@ public class Main {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            webPageScraper.closeDriver();
         }
     }
 
-    private void processQuery(String query, WebPageScraper webPageScraper, String outputCsv) {
+    private void processQuery(String query, String outputCsv) {
+        WebPageScraper webPageScraper = scraperThreadLocal.get();
         int resultCount = webPageScraper.getSearchResultsCount(query);
 
         if (resultCount != -1 && resultCount <= 150) {

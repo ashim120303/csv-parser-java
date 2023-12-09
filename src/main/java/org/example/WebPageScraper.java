@@ -28,7 +28,7 @@ public class WebPageScraper {
         // Передайте объект ChromeOptions при создании ChromeDriver
         driver = new ChromeDriver(chromeOptions);
 
-        wait = new WebDriverWait(driver, 5);
+        wait = new WebDriverWait(driver, 10);
     }
 
     public int getSearchResultsCount(String query) {
