@@ -39,7 +39,9 @@ public class WebPageScraper {
             query = query.replace("+", "%2B");
         }
 
-        driver.get("https://www.wildberries.ru/catalog/0/search.aspx?search=" + query);
+        String url = "https://www.wildberries.ru/catalog/0/search.aspx?search=" + query;
+
+        driver.get(url);
 
         int resultCount = 0;
 
@@ -57,15 +59,16 @@ public class WebPageScraper {
             // Проверка наличия элемента с классом not-found-search__title (если результатов поиска нет)
             List<WebElement> notFoundElements = driver.findElements(By.className("not-found-search__title"));
             if (!notFoundElements.isEmpty()) {
-                System.out.println("Результат поиска для запроса: " + query + " ничего не найдено.");
+                System.out.println("Результат поиска для запроса: " + query + " ничего не найдено. URL запроса: " + url);
                 return 0; // Возвращаем 0, когда на странице есть элемент not-found-search__title
             } else {
-                System.out.println("Результат поиска для запроса: " + query + " бренд или id продукта. Пропуск запроса.");
+                System.out.println("Результат поиска для запроса: " + query + " бренд или id продукта. Пропуск запроса. URL запроса: " + url);
                 return -1; // Возвращаем -1, на странице нет элемента not-found-search__title и searching-results__count (Бренд или id продукта)
             }
         }
         return resultCount;
     }
+
 
     public void closeDriver() {
         driver.quit();
