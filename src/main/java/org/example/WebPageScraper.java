@@ -45,27 +45,42 @@ public class WebPageScraper {
 
         int resultCount = 0;
 
-        try {
-            // Проверка наличия элемента searching-results__count
-            WebElement countElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.className("searching-results__count")));
 
-            // Проверка видимости элемента searching-results__count
-            wait.until(ExpectedConditions.visibilityOf(countElement));
+        boolean retry = true;
 
-            String countText = countElement.getText();
-            resultCount = Integer.parseInt(countText.replaceAll("\\D", ""));
-            System.out.println("Результат поиска:  " + query + ": " + resultCount);
-        } catch (TimeoutException e) {
-            // Проверка наличия элемента с классом not-found-search__title (если результатов поиска нет)
-            List<WebElement> notFoundElements = driver.findElements(By.className("not-found-search__title"));
-            if (!notFoundElements.isEmpty()) {
-                System.out.println("Результат поиска для запроса: " + query + " ничего не найдено. URL запроса: " + url);
-                return 0; // Возвращаем 0, когда на странице есть элемент not-found-search__title
-            } else {
-                System.out.println("Результат поиска для запроса: " + query + " бренд или id продукта. Пропуск запроса. URL запроса: " + url);
-                return -1; // Возвращаем -1, на странице нет элемента not-found-search__title и searching-results__count (Бренд или id продукта)
+        while (retry) {
+            try {
+                // Ваш текущий код для проверки результатов поиска
+                WebElement countElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.className("searching-results__count")));
+                wait.until(ExpectedConditions.visibilityOf(countElement));
+
+                String countText = countElement.getText();
+                resultCount = Integer.parseInt(countText.replaceAll("\\D", ""));
+                System.out.println("Результат поиска:  " + query + ": " + resultCount);
+
+                // Если успешно завершили блок try, устанавливаем retry в false, чтобы выйти из цикла
+                retry = false;
+
+            } catch (TimeoutException e) {
+                // Ваш текущий код для обработки исключений
+
+                List<WebElement> notFoundElements = driver.findElements(By.className("not-found-search__title"));
+                List<WebElement> brand = driver.findElements(By.className("brand-header"));
+                List<WebElement> product = driver.findElements(By.className("product-page__header-wrap"));
+
+                if (!notFoundElements.isEmpty()) {
+                    System.out.println("Результат поиска для запроса: " + query + " ничего не найдено. URL запроса: " + url);
+                    return 0;
+                } else if (!brand.isEmpty() || !product.isEmpty()) {
+                    System.out.println("Результат поиска для запроса: " + query + " бренд или id продукта. Пропуск запроса. URL запроса: " + url);
+                    return -1;
+                } else {
+                    // Условие для продолжения цикла (повторного поиска)
+                    System.out.println("Результат поиска:  " + query + ": " + resultCount + " Задержка сети. Повтор запроса.");
+                }
             }
         }
+
         return resultCount;
     }
 

@@ -14,7 +14,7 @@ public class Main {
         FileHandler.createFileIfNotExists(outputCsv);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(inputCsv))) {
-            ExecutorService executor = Executors.newFixedThreadPool(5);
+            ExecutorService executor = Executors.newFixedThreadPool(10);
 
             String line;
             while ((line = reader.readLine()) != null) {
