@@ -10,8 +10,9 @@ public class Main {
 
     private final ThreadLocal<WebPageScraper> scraperThreadLocal = ThreadLocal.withInitial(WebPageScraper::new);
 
-    public void scrapeData(String inputCsv, String outputCsv) {
+    public void scrapeData(String inputCsv, String outputCsv, String errorsCsv) {
         FileHandler.createFileIfNotExists(outputCsv);
+        FileHandler.createFileIfNotExists(errorsCsv);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(inputCsv))) {
             ExecutorService executor = Executors.newFixedThreadPool(10);
@@ -19,7 +20,7 @@ public class Main {
             String line;
             while ((line = reader.readLine()) != null) {
                 final String query = line.trim();
-                executor.submit(() -> processQuery(query, outputCsv));
+                executor.submit(() -> processQuery(query, outputCsv, errorsCsv));
             }
 
             executor.shutdown();
@@ -31,17 +32,19 @@ public class Main {
         }
     }
 
-    private void processQuery(String query, String outputCsv) {
+    private void processQuery(String query, String outputCsv, String errorsCsv) {
         WebPageScraper webPageScraper = scraperThreadLocal.get();
         int resultCount = webPageScraper.getSearchResultsCount(query);
 
-        if (resultCount != -1 && resultCount <= 150) {
+        if (resultCount != -2 && resultCount != -1 && resultCount <= 150) {
             FileHandler.saveToFile(query, resultCount, outputCsv);
+        } else if (resultCount == -2) {
+            FileHandler.saveToFile(query, resultCount, errorsCsv);
         }
     }
 
     public static void main(String[] args) {
         Main main = new Main();
-        main.scrapeData("вб.csv", "output.csv");
+        main.scrapeData("вб.csv", "output.csv", "errors.csv");
     }
 }

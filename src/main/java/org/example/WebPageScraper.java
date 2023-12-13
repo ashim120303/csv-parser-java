@@ -79,7 +79,7 @@ public class WebPageScraper {
                 } else {
                     if (retryCount >= maxRetry) {
                         System.out.println("Достигнуто максимальное количество попыток. Пропуск запроса. " + query);
-                        return -1; // Пропускаем запрос после 10 неудачных попыток
+                        return -2; // Пропускаем запрос после 10 неудачных попыток
                     }
 
                     retryCount++;
